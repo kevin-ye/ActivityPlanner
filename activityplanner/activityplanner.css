@@ -1,0 +1,45 @@
+.activityplanner_scrollable-menu {
+	height: :auto;
+	max-height: 200px;
+	overflow-x: hidden;
+}
+
+.activityplanner_center {
+	margin-left: auto;
+	margin-right: auto;
+	width: 70%;
+}
+
+.activityplanner_form_field {
+	//margin-bottom: 15px;
+}
+
+.activityplanner_form_field label {
+	float: left;
+	width: 30%;
+	text-align: right;
+	padding-right: 10px;
+	margin: 10px 0px 5px 0px;
+}
+
+.activityplanner_form_field .activityplanner_form_menu .btn-group {
+	width: 70%;
+	margin: 0px;
+}
+
+.activityplanner_form_field .activityplanner_form_menu input {
+	width: 70%;
+	margin: 33px 0px 5px 0px;
+}
+
+.activityplanner_searchfood_button {
+	float: right;
+}
+
+.activityplanner_searchmovie_button {
+	float: right;
+}
+
+.activityplanner_searchtour_button {
+	float: right;
+}
