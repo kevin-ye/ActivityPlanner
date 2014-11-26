@@ -53,6 +53,35 @@ function activityplanner(userid, htmlId) {
 		}
 	};
 
+	var googlemapapi = {
+		apistring: "https://maps.googleapis.com/maps/api/js?key=AIzaSyAkicREnJFjoGpxtZ4oRUhXuioNNuCUIc4",
+		loaded: 0,
+
+		load: function() {
+			this.loaded = 1;
+			$.getScript(googlemapapi.apistring).fail(function(){
+				DebugLog.log("google map api failed to load.");
+				googlemapapi.loaded = 0;
+			}).done(function(){
+				DebugLog.log("google map api loaded.");
+				googlemapapi.loaded = 2;
+			});
+		},
+
+		test: function() {
+			if (this.loaded === 0) {
+				this.load();
+			}
+			var mapOptions = {
+				center: { lat: -34.397, lng: 150.644},
+				zoom: 8
+			};
+			var map = new google.maps.Map(document.getElementById('activityplanner_offfooditem'),
+				mapOptions);
+
+		}
+	};
+
 	var mainModel = {
 		views: [],
 
@@ -118,6 +147,7 @@ function activityplanner(userid, htmlId) {
 		},
 
 		findFood: function(diet, time) {
+			//googlemapapi.test();
 			DebugLog.log('Starting to find menu.');
 			// fetch selected info
 			var diet = $('#activityplanner_diet_dropdown').find('.dropdown-toggle').text().trim();
@@ -146,47 +176,43 @@ function activityplanner(userid, htmlId) {
 			};
 			// find and load menu to result list
 			//DebugLog.log(uwapi.getfood());
+			//DebugLog.log(uwapi.getfood());
 			var foodxml = $.parseXML(uwapi.getfood());
-			document.evaluate();
-			$(foodxml).find("data").find("outlets").find("menu").find("meals").each(function () {
-				if ((time === "Any")) {
-					// lunch
-					var title = $(this).find("lunch").find("product_name").text().trim();
-					var detail = "Lunch";
-					var thediet = $(this).find("lunch").find("diet_type").text();
-					DebugLog.log(title + ":" + thediet);
-					if ((diet === "Any") || (thediet === null) || (thediet === diet)) {
+			$(foodxml).find("data").find("outlets").find("item").each(function () {
+				var theoutlet = this;
+				if ((time === "Any") || (time === "Lunch")) {
+					$(theoutlet).find("menu").find("meals").find("lunch").find("item").each(function () {
+						var thelunch = this;
+						var theProductName = $(this).find("product_name").text().trim();
+						var thediet = $(this).find("diet_type").text().trim();
+						if ((thediet === "") || ((diet !== "Any") && (thediet !== diet))) {
+							return;
+						};
+						var title = theProductName;
+						var detail = thediet + " Lunch@" + $(theoutlet).find("outlet_name").text().trim();
 						var t = Mustache.render(templates.onfood, {ftitle: title, fdetail: detail});
 						$('#activityplanner_onfooditem').append(t);
-					}
-					// dinner
-					title = $(this).find("dinner").find("product_name").text().trim();
-					detail = "Dinner, ";
-					thediet = $(this).find("dinner").find("diet_type").text();
-					DebugLog.log(title + ":" + thediet);
-					if ((diet === "Any") || (thediet === null) || (thediet === diet)) {
+					});
+				};
+				if ((time === "Any") || (time === "Dinner")) {
+					$(theoutlet).find("menu").find("meals").find("dinner").find("item").each(function () {
+						var thelunch = this;
+						var theProductName = $(this).find("product_name").text().trim();
+						var thediet = $(this).find("diet_type").text().trim();
+						if ((thediet === "") || ((diet !== "Any") && (thediet !== diet))) {
+							return;
+						};
+						var title = theProductName;
+						var detail = thediet + " Dinner@" + $(theoutlet).find("outlet_name").text().trim();
 						var t = Mustache.render(templates.onfood, {ftitle: title, fdetail: detail});
 						$('#activityplanner_onfooditem').append(t);
-					}
-				} else if (time === "Lunch") {
-					// lunch
-					var title = $(this).find("lunch").find("product_name").text().trim();
-					var detail = "Lunch, ";
-					var thediet = $(this).find("lunch").find("diet_type");
-					if ((diet === "Any") || (thediet === null) || (thediet === diet)) {
-						var t = Mustache.render(templates.onfood, {ftitle: title, fdetail: detail});
-						$('#activityplanner_onfooditem').append(t);
-					}
-				} else if (time === "Dinner") {
-					// dinner
-					var title = $(this).find("dinner").find("product_name").text().trim();
-					var detail = "Dinner, ";
-					var thediet = $(this).find("dinner").find("diet_type");
-					if ((diet === "Any") || (thediet === null) || (thediet === diet)) {
-						var t = Mustache.render(templates.onfood, {ftitle: title, fdetail: detail});
-						$('#activityplanner_onfooditem').append(t);
-					}
+					});
 				}
+			});
+			$('.list-group-item').on('click',function(e){
+				var previous = $(this).closest(".list-group").children(".active");
+				previous.removeClass('active'); // previous list-item
+				$(e.target).addClass('active'); // activate list-item
 			});
 			DebugLog.log('Finished finding menu.');
 		},
@@ -219,6 +245,7 @@ function activityplanner(userid, htmlId) {
 			mainModel.addView(this.updateView);
 			mainModel.addView(todayView.updateView);
 			DebugLog.log("all Views Initialized.");
+			googlemapapi.load();
 			$(".dropdown-menu li a").click(function(){
 				var selText = $(this).text();
 				$(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
