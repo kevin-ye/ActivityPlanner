@@ -22,17 +22,33 @@ function activityplanner(userid, htmlId) {
 		data: null,
 		apidriver: null,
 
-		getholiday: function() {
+		getdiet: function() {
 			try
 			{
-				this.apidriver = new XMLHttpRequest();
-				this.apidriver.open('GET', this.apiurl + "events/holidays.xml", false);
-				this.apidriver.send(this.apitkey);
-				this.data = this.apidriver.responseText;
-				return this.data;
+				uwapi.data = null;
+			    uwapi.apidriver = new XMLHttpRequest();
+				uwapi.apidriver.open('GET', uwapi.apiurl + "foodservices/diets.xml?key="+uwapi.apitkey, false);
+				uwapi.apidriver.send(uwapi.apitkey);
+				uwapi.data = uwapi.apidriver.responseText;
+				return uwapi.data;	
 			} catch (err) {
 				DebugLog.err(err);
-				console.log("activityplanner: Error accessing UW API!");
+				console.log("Error accessing UW API!");
+			}
+		},
+
+		getfood: function() {
+			try
+			{
+				uwapi.data = null;
+			    uwapi.apidriver = new XMLHttpRequest();
+				uwapi.apidriver.open('GET', uwapi.apiurl + "foodservices/menu.xml?key="+uwapi.apitkey, false);
+				uwapi.apidriver.send(uwapi.apitkey);
+				uwapi.data = uwapi.apidriver.responseText;
+				return uwapi.data;	
+			} catch (err) {
+				DebugLog.err(err);
+				console.log("Error accessing UW API!");
 			}
 		}
 	};
@@ -50,37 +66,144 @@ function activityplanner(userid, htmlId) {
 		addView: function(view) {
 			this.views.push(view);
 			view("");
+		},
+
+		notifyView: function(info) {
+			this.updateAllView(info);
 		}
 	};
 
-	var holidayView = {
-		holidayNameList: [],
-		holidayDateList: [],
+	var todayView = {
+		dietList: [],
 
-		clear: function() {
-			$("#activityplanner_dropdown_holiday ul").empty();
-			DebugLog.log("clear");
+		clearDietList: function() {
+			$('#activityplanner_diet_dropdown ul').empty();
+			DebugLog.log("Diet list cleared.");
 		},
 
-		reloadList: function() {
-			var list = $.parseXML(uwapi.getholiday());
+		clearTimeList: function() {
+			$('#activityplanner_time_dropdown ul').empty();
+			DebugLog.log("Time list cleared.");
+		},
+
+		reloadTimeList: function() {
+			var temp = '<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Any</a></li>';
+			$('#activityplanner_time_dropdown ul').append(temp);
+			var t = '<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Lunch</a></li>';
+			$('#activityplanner_time_dropdown ul').append(t);
+			t = '<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Dinner</a></li>';
+			$('#activityplanner_time_dropdown ul').append(t);
+			DebugLog.log("Time list reloaded.");
+		},
+
+		reloadDietList: function() {
+			todayView.clearDietList();
+			var list = $.parseXML(uwapi.getdiet());
+			var temp = '<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Any</a></li>';
+			$('#activityplanner_diet_dropdown ul').append(temp);
 			$(list).find("data").find("item").each(function(){
 				//DebugLog.log($(this).find("name").text() + " " + $(this).find("date").text());
-				var dname = $(this).find("name").text();
-				var ddate = $(this).find("date").text();
+				var dname = $(this).find("diet_type").text();
 				var t = '<li role="presentation"><a role="menuitem" tabindex="-1" href="#">' + dname + '</a></li>';
-				holidayView.holidayNameList.push(dname);
-				holidayView.holidayDateList.push(ddate);
-				$("#activityplanner_holiday_dropdown ul").append(t);
+				todayView.dietList.push(dname);
+				$('#activityplanner_diet_dropdown ul').append(t);
 			});
 
-			DebugLog.log("Holiday list reloaded.");
+			DebugLog.log("Diet list reloaded.");
+		},
+
+		clearResult: function() {
+			$('#activityplanner_today_result div').empty();
+			DebugLog.log('Today result list cleared.');
+		},
+
+		findFood: function(diet, time) {
+			DebugLog.log('Starting to find menu.');
+			// fetch selected info
+			var diet = $('#activityplanner_diet_dropdown').find('.dropdown-toggle').text().trim();
+			var time = $('#activityplanner_time_dropdown').find('.dropdown-toggle').text().trim();
+			if (diet === "Select diet") {
+				$('#activityplanner_today_diet').popover({animation: true,
+					content: "Please choose one diet.", placement: "bottom",
+					delay: { "show": 0, "hide": 3000 }
+				});
+				$('#activityplanner_today_diet').popover('show');
+				setTimeout(function() {
+					$('#activityplanner_today_diet').popover('destroy');
+				}, 3000);
+				return;
+			};
+			if (time === "Select Meal") {
+				$('#activityplanner_today_time').popover({animation: true,
+					content: "Please choose one diet.", placement: "bottom",
+					delay: { "show": 0, "hide": 3000 }
+				});
+				$('#activityplanner_today_time').popover('show');
+				setTimeout(function() {
+					$('#activityplanner_today_time').popover('destroy');
+				}, 3000);
+				return;
+			};
+			// find and load menu to result list
+			//DebugLog.log(uwapi.getfood());
+			var foodxml = $.parseXML(uwapi.getfood());
+			document.evaluate();
+			$(foodxml).find("data").find("outlets").find("menu").find("meals").each(function () {
+				if ((time === "Any")) {
+					// lunch
+					var title = $(this).find("lunch").find("product_name").text().trim();
+					var detail = "Lunch";
+					var thediet = $(this).find("lunch").find("diet_type").text();
+					DebugLog.log(title + ":" + thediet);
+					if ((diet === "Any") || (thediet === null) || (thediet === diet)) {
+						var t = Mustache.render(templates.onfood, {ftitle: title, fdetail: detail});
+						$('#activityplanner_onfooditem').append(t);
+					}
+					// dinner
+					title = $(this).find("dinner").find("product_name").text().trim();
+					detail = "Dinner, ";
+					thediet = $(this).find("dinner").find("diet_type").text();
+					DebugLog.log(title + ":" + thediet);
+					if ((diet === "Any") || (thediet === null) || (thediet === diet)) {
+						var t = Mustache.render(templates.onfood, {ftitle: title, fdetail: detail});
+						$('#activityplanner_onfooditem').append(t);
+					}
+				} else if (time === "Lunch") {
+					// lunch
+					var title = $(this).find("lunch").find("product_name").text().trim();
+					var detail = "Lunch, ";
+					var thediet = $(this).find("lunch").find("diet_type");
+					if ((diet === "Any") || (thediet === null) || (thediet === diet)) {
+						var t = Mustache.render(templates.onfood, {ftitle: title, fdetail: detail});
+						$('#activityplanner_onfooditem').append(t);
+					}
+				} else if (time === "Dinner") {
+					// dinner
+					var title = $(this).find("dinner").find("product_name").text().trim();
+					var detail = "Dinner, ";
+					var thediet = $(this).find("dinner").find("diet_type");
+					if ((diet === "Any") || (thediet === null) || (thediet === diet)) {
+						var t = Mustache.render(templates.onfood, {ftitle: title, fdetail: detail});
+						$('#activityplanner_onfooditem').append(t);
+					}
+				}
+			});
+			DebugLog.log('Finished finding menu.');
 		},
 
 		updateView: function(info) {
 			if (info === "") {
-				holidayView.clear();
-				holidayView.reloadList();
+				// attach search events
+				$('#activityplanner_searchfood').on('click', function(e){
+					mainModel.notifyView("todayView result");
+				});
+				// reload lists
+				todayView.reloadDietList();
+				todayView.reloadTimeList();
+				todayView.clearResult();
+			} else if (info === "todayView result") {
+				todayView.clearResult();
+				todayView.findFood();
 			};
 		}
 	}
@@ -94,7 +217,7 @@ function activityplanner(userid, htmlId) {
 
 		initViews: function(){
 			mainModel.addView(this.updateView);
-			mainModel.addView(holidayView.updateView);
+			mainModel.addView(todayView.updateView);
 			DebugLog.log("all Views Initialized.");
 			$(".dropdown-menu li a").click(function(){
 				var selText = $(this).text();
@@ -107,7 +230,7 @@ function activityplanner(userid, htmlId) {
 	 * Initialize the widget.
 	 */
 	try {
-		portal.loadTemplates("widgets/activityplanner/templates.txt",
+		portal.loadTemplates("widgets/activityplanner/templates.html",
 												 function (t) {
 													 templates = t;
 													 $(htmlId).html(templates.baseHtml);

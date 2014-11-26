@@ -22,24 +22,52 @@
 	margin: 10px 0px 5px 0px;
 }
 
-.activityplanner_form_field .activityplanner_form_menu .btn-group {
+.activityplanner_form_field .activityplanner_form_menu {
 	width: 70%;
 	margin: 0px;
 }
 
-.activityplanner_form_field .activityplanner_form_menu input {
+.activityplanner_form_field .checkbox {
 	width: 70%;
-	margin: 33px 0px 5px 0px;
+	margin: 25px 0px 5px 0px;
 }
 
 .activityplanner_searchfood_button {
 	float: right;
+	margin: -10px 0px 5px 0px;
 }
 
-.activityplanner_searchmovie_button {
+.activityplanner_searchoff_button {
 	float: right;
+	margin: 25px 0px 5px 0px;
 }
 
 .activityplanner_searchtour_button {
 	float: right;
+	margin: 25px 0px 5px 0px;
+}
+
+.activityplanner_today_result_panel {
+	position: absolute;
+	top: 48%;
+	bottom: 20px;
+	width: 90%;
+	margin: 0px 0px 0px 0px;
+}
+
+.activityplanner_weekends_result_panel {
+	position: absolute;
+	top: 60%;
+	bottom: 20px;
+	width: 90%;
+	margin: 0px 0px 0px 0px;
+}
+
+.tab-pane form {
+	margin: 20px 0px 5px 0px;
+}
+
+#activityplanner_today_result {
+	height: auto;
+	overflow-x: hidden;
 }

@@ -1,0 +1,74 @@
+baseHtml
+@@@@
+<div role="tabpanel">
+
+	<h3 class="activityplanner_center">Today's Menu</h3>
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#activityplanner_today" aria-controls="home" role="tab" data-toggle="tab">On campus</a></li>
+    <li role="presentation"><a href="#activityplanner_off" aria-controls="profile" role="tab" data-toggle="tab">Off campus</a></li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane fade in active" id="activityplanner_today">
+      <form method="post" action="" role="form" class="form-inline">
+        <div class="activityplanner_form_field">
+          <label>Diet:</label>
+          <div id="activityplanner_today_diet" class="btn-group activityplanner_form_menu" data-toggle="popover">
+            <div class="btn-group" id="activityplanner_diet_dropdown"> <a class="btn btn-default dropdown-toggle btn-select" data-toggle="dropdown" href="#">Select diet<span class="caret"></span></a>
+              <ul class="dropdown-menu activityplanner_scrollable-menu">
+              </ul>
+            </div>
+          </div>
+        </div><br>
+        <div class="activityplanner_form_field">
+          <label>Time: </label>
+          <div id="activityplanner_today_time" class="btn-group activityplanner_form_menu">
+            <div class="btn-group" id="activityplanner_time_dropdown"> <a class="btn btn-default dropdown-toggle btn-select" data-toggle="dropdown" href="#">Select Meal<span class="caret"></span></a>
+              <ul class="dropdown-menu activityplanner_scrollable-menu">
+              </ul>
+            </div>
+          </div>
+        </div><br>
+      </form>
+      <button id="activityplanner_searchfood" class="btn btn-info activityplanner_searchfood_button">Search</button>
+      <div id="activityplanner_today_result" class="panel panel-default activityplanner_today_result_panel">
+      	<div class="list-group" id="activityplanner_onfooditem">
+      	</div>
+      </div>
+    </div>
+    <div role="tabpanel" class="tab-pane fade" id="activityplanner_off">
+      <div id="activityplanner_weekends_time" class="btn-group">
+        <div class="btn-group" id="activityplanner_weekends_dropdown"> <a class="btn btn-default dropdown-toggle btn-select" data-toggle="dropdown" href="#">Select Time <span class="caret"></span></a>
+          <ul class="dropdown-menu activityplanner_scrollable-menu">
+          </ul>
+        </div>
+      </div><br>
+      <button id="activityplanner_searchoff" class="btn btn-default activityplanner_searchmovie_button">Search</button>
+      <div id="activityplanner_weekends_result" class="panel panel-default activityplanner_weekends_result_panel">
+      	<div class="list-group">
+      		<a href="#" class="list-group-item">
+      			<h4 class="list-group-item-heading">List group item heading</h4>
+      			<p class="list-group-item-text">...</p>
+      		</a>
+      	</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+@@@@
+onfood
+@@@@
+<a href="#" class="list-group-item">
+  <h4 class="list-group-item-heading">{{ftitle}}</h4>
+  <p class="list-group-item-text">{{fdetail}}</p>
+</a>
+
+@@@@
+error
+@@@@
+<p>Course not found.</p>
