@@ -17,23 +17,29 @@ baseHtml
         <div class="activityplanner_form_field">
           <label>Diet:</label>
           <div id="activityplanner_today_diet" class="btn-group activityplanner_form_menu" data-toggle="popover">
-            <div class="btn-group" id="activityplanner_diet_dropdown"> <a class="btn btn-default dropdown-toggle btn-select" data-toggle="dropdown" href="#">Select diet<span class="caret"></span></a>
-              <ul class="dropdown-menu activityplanner_scrollable-menu">
-              </ul>
-            </div>
+            <button class="btn btn-success btn-block dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="activityplanner_diet_dropdown">
+              Select diet
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu activityplanner_scrollable-menu">
+            </ul>
           </div>
         </div><br>
         <div class="activityplanner_form_field">
           <label>Time: </label>
           <div id="activityplanner_today_time" class="btn-group activityplanner_form_menu">
-            <div class="btn-group" id="activityplanner_time_dropdown"> <a class="btn btn-default dropdown-toggle btn-select" data-toggle="dropdown" href="#">Select Meal<span class="caret"></span></a>
-              <ul class="dropdown-menu activityplanner_scrollable-menu">
-              </ul>
-            </div>
+            <button class="btn btn-success btn-block dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="activityplanner_time_dropdown">
+              Select Meal
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu activityplanner_scrollable-menu">
+            </ul>
           </div>
         </div><br>
       </form>
-      <button id="activityplanner_searchfood" class="btn btn-info activityplanner_searchfood_button">Search</button>
+      <button id="activityplanner_searchfood" class="btn btn-info activityplanner_searchfood_button">
+        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>Search
+      </button>
       <div id="activityplanner_today_result" class="panel panel-default activityplanner_today_result_panel">
       	<div class="list-group" id="activityplanner_onfooditem">
       	</div>
@@ -53,7 +59,9 @@ baseHtml
           <label class="input-group-addon">Now opening only.</label>
         </div>
       </div><br>
-      <button id="activityplanner_searchoff" class="btn btn-info activityplanner_searchmovie_button">Search</button>
+      <button id="activityplanner_searchoff" class="btn btn-info activityplanner_searchmovie_button">
+        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>Search
+      </button>
       <div id="activityplanner_searchoff_result" class="panel panel-default activityplanner_searchoff_result_panel">
         <div id="activityplanner_searchoff_map"></div>
       </div>

@@ -185,22 +185,22 @@ function activityplanner(userid, htmlId) {
 		dietList: [],
 
 		clearDietList: function() {
-			$('#activityplanner_diet_dropdown ul').empty();
+			$('#activityplanner_today_diet ul').empty();
 			DebugLog.log("Diet list cleared.");
 		},
 
 		clearTimeList: function() {
-			$('#activityplanner_time_dropdown ul').empty();
+			$('#activityplanner_today_time ul').empty();
 			DebugLog.log("Time list cleared.");
 		},
 
 		reloadTimeList: function() {
 			var temp = '<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Any</a></li>';
-			$('#activityplanner_time_dropdown ul').append(temp);
+			$('#activityplanner_today_time ul').append(temp);
 			var t = '<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Lunch</a></li>';
-			$('#activityplanner_time_dropdown ul').append(t);
+			$('#activityplanner_today_time ul').append(t);
 			t = '<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Dinner</a></li>';
-			$('#activityplanner_time_dropdown ul').append(t);
+			$('#activityplanner_today_time ul').append(t);
 			DebugLog.log("Time list reloaded.");
 		},
 
@@ -208,13 +208,13 @@ function activityplanner(userid, htmlId) {
 			todayView.clearDietList();
 			var list = $.parseXML(uwapi.getdiet());
 			var temp = '<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Any</a></li>';
-			$('#activityplanner_diet_dropdown ul').append(temp);
+			$('#activityplanner_today_diet ul').append(temp);
 			$(list).find("data").find("item").each(function(){
 				//DebugLog.log($(this).find("name").text() + " " + $(this).find("date").text());
 				var dname = $(this).find("diet_type").text();
 				var t = '<li role="presentation"><a role="menuitem" tabindex="-1" href="#">' + dname + '</a></li>';
 				todayView.dietList.push(dname);
-				$('#activityplanner_diet_dropdown ul').append(t);
+				$('#activityplanner_today_diet ul').append(t);
 			});
 
 			DebugLog.log("Diet list reloaded.");
@@ -228,8 +228,8 @@ function activityplanner(userid, htmlId) {
 		findFood: function(diet, time) {
 			DebugLog.log('Starting to find menu.');
 			// fetch selected info
-			var diet = $('#activityplanner_diet_dropdown').find('.dropdown-toggle').text().trim();
-			var time = $('#activityplanner_time_dropdown').find('.dropdown-toggle').text().trim();
+			var diet = $('#activityplanner_today_diet').find('.dropdown-toggle').text().trim();
+			var time = $('#activityplanner_today_time').find('.dropdown-toggle').text().trim();
 			if (diet === "Select diet") {
 				$('#activityplanner_today_diet').popover({animation: true,
 					content: "Please choose one diet.", placement: "bottom",
