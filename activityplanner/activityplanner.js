@@ -91,6 +91,11 @@ function activityplanner(userid, htmlId) {
 			googlemapapi.themap = map;
 		},
 
+		deleteMap: function() {
+			$('#activityplanner_searchoff_map').empty();
+			googlemapapi.themap = null;
+		},
+
 		searchNearby: function(rad, open) {
 			if (!googlemapapi.themap) {
 				googlemapapi.loadMap();
@@ -99,9 +104,9 @@ function activityplanner(userid, htmlId) {
 			googlemapapi.themap.addLayer('places',
 				{location:{lat: 43.472285, lng: -80.544858} ,
 					radius: rad,
-					query: 'food',
+					keyword: 'food',
 					openNow: open,
-					textSearch: googlemapapi.callback});
+					radarSearch: googlemapapi.callback});
 		},
 
 		callback: function(places, status) {
@@ -111,21 +116,63 @@ function activityplanner(userid, htmlId) {
 			}
 			for (var i = 0; i < places.length; i++) {
 				var current = places[i];
+				// *
+				// check the distance if it is inside the radius
+				// **** THANKS Google Map, your radar search API is broken
+				// **** and now I have to write my onw alg to check the distance.
+				// **** (the API returns the same result even with different rad augment)
+				// **** (Guess what, te cord is in Lat/Lng, but they do the caluation based on meter....)
+				// *
+				var earthRadius = 6371000;
+				var lat1 = 43.472285;
+				var lng1 = -80.544858;
+				var lat2 = current.geometry.location.k;
+				var lng2 = current.geometry.location.B;
+				var dLat = lat2-lat1;
+				dLat = dLat * Math.PI / 180;
+				var dLng = lng2-lng1;
+				dLng = dLng * Math.PI / 180;
+				var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+					Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+					Math.sin(dLng/2) * Math.sin(dLng/2);
+				var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+				var dis = (earthRadius * c);
+				if (!((mainModel.rad <= 0) || (mainModel.rad >= 50000) || (dis <= mainModel.rad))) {
+					continue;
+				}
+
 				googlemapapi.themap.addMarker({
 					position: current.geometry.location,
 					icon: {
+						placeinfo: current,
+						pname: "",
 						path: 'M 0,-24 6,-7 24,-7 10,4 15,21 0,11 -15,21 -10,4 -24,-7 -6,-7 z',
 						fillColor: '#ffff00',
 						fillOpacity: 1,
-						scale: 1/4,
+						scale: 1/3,
 						strokeColor: '#bd8d2c',
 						strokeWeight: 1
 					},
-					infoWindow: {
-						content: '<div style="height: 45px; width: auto;"><a href="https://www.google.ca/#q=' + current.name
-						    + '" target="_blank">' +
-							current.name +
-						    '</a></div>'}
+					infoWindow: {content:""},
+					click: function(e){
+						var service = new google.maps.places.PlacesService(googlemapapi.themap.map);
+						var that = this;
+						service.getDetails(this.icon.placeinfo, function(place, status){
+							if (status == google.maps.places.PlacesServiceStatus.OK) {
+								that.icon.pname = place.name;
+							} else {
+								DebugLog.log(status.text());
+								that.icon.pname = status.text();
+							}
+						});
+						if (this.icon.pname === "") {
+							return;
+						}
+						this.infoWindow.content = '<div style="height: 45px; width: auto;"><a href="https://www.google.ca/#q='
+						+ this.icon.pname
+						+ '" target="_blank">' +
+						this.icon.pname +  '</a></div>';
+					}
 				});
 			}
 		}
@@ -133,6 +180,7 @@ function activityplanner(userid, htmlId) {
 
 	var mainModel = {
 		views: [],
+		searchRad: 0,
 
 		updateAllView: function(info) {
 			var i = 0;
@@ -169,6 +217,7 @@ function activityplanner(userid, htmlId) {
 					mainModel.notifyView("offcampusView result");
 				});
 			} else if (info === "offcampusView result") {
+				mainModel.rad = parseInt($('#activityplanner_off_rad_input').val());
 				offcampusView.refresh_and_loadNearby();
 			};
 		},
@@ -176,6 +225,7 @@ function activityplanner(userid, htmlId) {
 		refresh_and_loadNearby: function() {
 			var rad = $('#activityplanner_off_rad_input').val();
 			var openingonly = $('#activityplanner_off_open_input').is(':checked');
+			googlemapapi.deleteMap();
 			googlemapapi.searchNearby(rad, openingonly);
 		}
 
