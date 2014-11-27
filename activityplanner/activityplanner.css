@@ -11,7 +11,7 @@
 }
 
 .activityplanner_form_field {
-	//margin-bottom: 15px;
+//margin-bottom: 15px;
 }
 
 .activityplanner_form_field label {
@@ -35,11 +35,6 @@
 .activityplanner_searchfood_button {
 	float: right;
 	margin: -10px 0px 5px 0px;
-}
-
-.activityplanner_searchoff_button {
-	float: right;
-	margin: 25px 0px 5px 0px;
 }
 
 .activityplanner_searchtour_button {
@@ -76,4 +71,24 @@
 #activityplanner_today_result {
 	height: auto;
 	overflow-x: hidden;
+}
+
+#activityplanner_off_rad {
+	margin: 25px 0px 5px 0px;
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+	width: auto;
+}
+
+#activityplanner_searchoff {
+	float: right;
+	margin: 10px 0px 5px 0px;
+}
+
+#activityplanner_off_rad2 {
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+	width: auto;
 }

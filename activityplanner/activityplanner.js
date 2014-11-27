@@ -66,15 +66,15 @@ function activityplanner(userid, htmlId) {
 			googlemapapi.loaded = 2;
 		},
 
-		test: function() {
+		loadMap: function() {
 			if (googlemapapi.loaded !== 2) {
 				DebugLog.log("Google Maps API is still loading.");
 				return;
 			}
 			var map = new GMaps({
 				div: '#activityplanner_searchoff_map',
-				lat: -12.043333,
-				lng: -77.028333,
+				lat: 43.472285,
+				lng: -80.544858,
 				width: "100%",
 				height: "100%",
 				zoomControl : true,
@@ -88,7 +88,46 @@ function activityplanner(userid, htmlId) {
 				overviewMapControl: false
 			});
 
-			themap = map;
+			googlemapapi.themap = map;
+		},
+
+		searchNearby: function(rad, open) {
+			if (!googlemapapi.themap) {
+				googlemapapi.loadMap();
+			}
+
+			googlemapapi.themap.addLayer('places',
+				{location:{lat: 43.472285, lng: -80.544858} ,
+					radius: rad,
+					query: 'food',
+					openNow: open,
+					textSearch: googlemapapi.callback});
+		},
+
+		callback: function(places, status) {
+			if (status !== "OK") {
+				DebugLog.log('Search failed.');
+				return;
+			}
+			for (var i = 0; i < places.length; i++) {
+				var current = places[i];
+				googlemapapi.themap.addMarker({
+					position: current.geometry.location,
+					icon: {
+						path: 'M 0,-24 6,-7 24,-7 10,4 15,21 0,11 -15,21 -10,4 -24,-7 -6,-7 z',
+						fillColor: '#ffff00',
+						fillOpacity: 1,
+						scale: 1/4,
+						strokeColor: '#bd8d2c',
+						strokeWeight: 1
+					},
+					infoWindow: {
+						content: '<div style="height: 45px; width: auto;"><a href="https://www.google.ca/#q=' + current.name
+						    + '" target="_blank">' +
+							current.name +
+						    '</a></div>'}
+				});
+			}
 		}
 	};
 
@@ -124,15 +163,22 @@ function activityplanner(userid, htmlId) {
 	};
 
 	var offcampusView = {
-			updateView: function(info) {
-				if (info === "") {
-					$('#activityplanner_searchoff').on('click', function(e){
-						mainModel.notifyView("offcampusView result");
-					});
-				} else if (info === "offcampusView result") {
-					googlemapapi.test();
-				};
-			}
+		updateView: function(info) {
+			if (info === "") {
+				$('#activityplanner_searchoff').on('click', function(e){
+					mainModel.notifyView("offcampusView result");
+				});
+			} else if (info === "offcampusView result") {
+				offcampusView.refresh_and_loadNearby();
+			};
+		},
+
+		refresh_and_loadNearby: function() {
+			var rad = $('#activityplanner_off_rad_input').val();
+			var openingonly = $('#activityplanner_off_open_input').is(':checked');
+			googlemapapi.searchNearby(rad, openingonly);
+		}
+
 		};
 
 	var todayView = {
@@ -296,7 +342,7 @@ function activityplanner(userid, htmlId) {
 	function loadScript() {
 		var script = document.createElement('script');
 		script.type = 'text/javascript';
-		script.src = "http://maps.google.com/maps/api/js?sensor=true&" +
+		script.src = "http://maps.google.com/maps/api/js?libraries=places&sensor=true&" +
 		'callback=initialize';
 		document.body.appendChild(script);
 	}

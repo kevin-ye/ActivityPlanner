@@ -40,13 +40,20 @@ baseHtml
       </div>
     </div>
     <div role="tabpanel" class="tab-pane fade" id="activityplanner_off">
-      <div id="activityplanner_weekends_time" class="btn-group">
-        <div class="btn-group" id="activityplanner_weekends_dropdown"> <a class="btn btn-default dropdown-toggle btn-select" data-toggle="dropdown" href="#">Select Time <span class="caret"></span></a>
-          <ul class="dropdown-menu activityplanner_scrollable-menu">
-          </ul>
+      <div id="activityplanner_off_rad" class="btn-group">
+        <div class="input-group">
+          <span class="input-group-addon">Radius:</span>
+          <input type="text" class="form-control" id="activityplanner_off_rad_input" value="1000">
+          <span class="input-group-addon">m</span>
+        </div><br>
+        <div class="input-group">
+          <span class="input-group-addon">
+            <input type="checkbox" id="activityplanner_off_open_input" checked>
+          </span>
+          <label class="input-group-addon">Now opening only.</label>
         </div>
       </div><br>
-      <button id="activityplanner_searchoff" class="btn btn-default activityplanner_searchmovie_button">Search</button>
+      <button id="activityplanner_searchoff" class="btn btn-info activityplanner_searchmovie_button">Search</button>
       <div id="activityplanner_searchoff_result" class="panel panel-default activityplanner_searchoff_result_panel">
         <div id="activityplanner_searchoff_map"></div>
       </div>
