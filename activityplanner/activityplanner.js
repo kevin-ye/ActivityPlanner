@@ -54,31 +54,41 @@ function activityplanner(userid, htmlId) {
 	};
 
 	var googlemapapi = {
-		apistring: "https://maps.googleapis.com/maps/api/js?key=AIzaSyAkicREnJFjoGpxtZ4oRUhXuioNNuCUIc4",
 		loaded: 0,
+		themap: null,
 
 		load: function() {
-			this.loaded = 1;
-			$.getScript(googlemapapi.apistring).fail(function(){
-				DebugLog.log("google map api failed to load.");
-				googlemapapi.loaded = 0;
-			}).done(function(){
-				DebugLog.log("google map api loaded.");
-				googlemapapi.loaded = 2;
-			});
+			googlemapapi.loaded = 1;
+			if (map_flag === false) {
+				//return;
+			}
+			mainModel.loadscript("widgets/activityplanner/external/gmaps.js","js");
+			googlemapapi.loaded = 2;
 		},
 
 		test: function() {
-			if (this.loaded === 0) {
-				this.load();
+			if (googlemapapi.loaded !== 2) {
+				DebugLog.log("Google Maps API is still loading.");
+				return;
 			}
-			var mapOptions = {
-				center: { lat: -34.397, lng: 150.644},
-				zoom: 8
-			};
-			var map = new google.maps.Map(document.getElementById('activityplanner_offfooditem'),
-				mapOptions);
+			var map = new GMaps({
+				div: '#activityplanner_searchoff_map',
+				lat: -12.043333,
+				lng: -77.028333,
+				width: "100%",
+				height: "100%",
+				zoomControl : true,
+				zoomControlOpt: {
+					style : 'SMALL',
+					position: 'TOP_LEFT'
+				},
+				panControl : false,
+				streetViewControl : false,
+				mapTypeControl: false,
+				overviewMapControl: false
+			});
 
+			themap = map;
 		}
 	};
 
@@ -99,8 +109,31 @@ function activityplanner(userid, htmlId) {
 
 		notifyView: function(info) {
 			this.updateAllView(info);
+		},
+
+		loadscript: function(filename, filetype) {
+			if (filetype == "js") {
+				var fileref = document.createElement('script')
+				fileref.setAttribute("type", "text/javascript")
+				fileref.setAttribute("src", filename)
+			}
+			if (typeof fileref != "undefined") {
+				document.getElementsByTagName("head")[0].appendChild(fileref);
+			}
 		}
 	};
+
+	var offcampusView = {
+			updateView: function(info) {
+				if (info === "") {
+					$('#activityplanner_searchoff').on('click', function(e){
+						mainModel.notifyView("offcampusView result");
+					});
+				} else if (info === "offcampusView result") {
+					googlemapapi.test();
+				};
+			}
+		};
 
 	var todayView = {
 		dietList: [],
@@ -147,7 +180,6 @@ function activityplanner(userid, htmlId) {
 		},
 
 		findFood: function(diet, time) {
-			//googlemapapi.test();
 			DebugLog.log('Starting to find menu.');
 			// fetch selected info
 			var diet = $('#activityplanner_diet_dropdown').find('.dropdown-toggle').text().trim();
@@ -244,6 +276,7 @@ function activityplanner(userid, htmlId) {
 		initViews: function(){
 			mainModel.addView(this.updateView);
 			mainModel.addView(todayView.updateView);
+			mainModel.addView(offcampusView.updateView);
 			DebugLog.log("all Views Initialized.");
 			googlemapapi.load();
 			$(".dropdown-menu li a").click(function(){
@@ -252,11 +285,30 @@ function activityplanner(userid, htmlId) {
 			});
 		}
 	};
-	
+
+	var map_flag = false;
+
+	function initialize() {
+		DebugLog.log("Google Maps API loaded.");
+		map_flag = true;
+	}
+
+	function loadScript() {
+		var script = document.createElement('script');
+		script.type = 'text/javascript';
+		script.src = "http://maps.google.com/maps/api/js?sensor=true&" +
+		'callback=initialize';
+		document.body.appendChild(script);
+	}
+
+	window.onload = loadScript;
+
+
 	/*
 	 * Initialize the widget.
 	 */
 	try {
+
 		portal.loadTemplates("widgets/activityplanner/templates.html",
 												 function (t) {
 													 templates = t;
@@ -264,4 +316,5 @@ function activityplanner(userid, htmlId) {
 													 mainView.initViews();
 												 });
 	} catch (err) { console.log("caught error: " + err)};
-} 
+}
+
