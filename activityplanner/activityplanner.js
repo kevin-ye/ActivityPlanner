@@ -342,7 +342,7 @@ function activityplanner(userid, htmlId) {
 	function loadScript() {
 		var script = document.createElement('script');
 		script.type = 'text/javascript';
-		script.src = "http://maps.google.com/maps/api/js?libraries=places&sensor=true&" +
+		script.src = "https://maps.google.com/maps/api/js?libraries=places&sensor=true&" +
 		'callback=initialize';
 		document.body.appendChild(script);
 	}
